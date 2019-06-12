@@ -1,0 +1,29 @@
+{
+  "name": "realTimeGame",
+  "version": "1.0.0",
+  "description": "SocketIO, Gulp, Node, Vanilla JS로 캐치마인드 클론",
+  "main": "index.js",
+  "repository": "https://github.com/twilight92/realTimeGame.git",
+  "author": "tnwjd2050 <tnwjd2050@naver.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/node": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "morgan": "^1.9.1",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2",
+    "pug": "^2.0.3",
+    "socket.io": "^2.2.0",
+    "soket.io": "^0.0.1-security"
+  },
+  "scripts": {
+    "dev:server": "nodemon --exec babel-node src/server"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^4.3.0",
+    "eslint-plugin-prettier": "^3.1.0"
+  }
+}
