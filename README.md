@@ -1,8 +1,8 @@
-#realTimeGame
+# realTimeGame
 
 SocketIO, Gulp, Node, Vanilla JS로 캐치마인드 클론
 
-##To Do:
+## To Do:
 
 - [x] Server
 - [x] Pug

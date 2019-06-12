@@ -12,7 +12,10 @@
     "@babel/preset-env": "^7.4.5",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^4.0.2",
     "morgan": "^1.9.1",
+    "node-sass": "^4.12.0",
     "nodemon": "^1.19.1",
     "prettier": "^1.18.2",
     "pug": "^2.0.3",
@@ -20,7 +23,8 @@
     "soket.io": "^0.0.1-security"
   },
   "scripts": {
-    "dev:server": "nodemon --exec babel-node src/server"
+    "dev:server": "nodemon --exec babel-node src/server",
+    "build:style": "gulp style"
   },
   "devDependencies": {
     "eslint-config-prettier": "^4.3.0",
