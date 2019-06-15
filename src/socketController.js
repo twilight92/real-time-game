@@ -21,16 +21,28 @@ const socketController = (socket, io) => {
             inProgress = true;
             leader = chooseLeader();
             word = chooseWord();
+            superBroadcast(events.gameStarting);
             //갑작스럽게 진행되지 않도록 setTimeout 걸어줌
             setTimeout(() => {
                 superBroadcast(events.gameStarted);
                 io.to(leader.id).emit(events.leaderNotif, { word });
-            }, 2000);
+            }, 3000);
         }
     };
     const endGame = () => {
         inProgress = false;
         superBroadcast(events.gameEnded);
+    };
+
+    const addPoints = (id) => {
+        sockets = sockets.map(socket => {
+            if(socket.id === id){
+                socket.points += 10;
+            }
+            return socket;
+        });
+        sandPlayerUpdate();
+        endGame();
     };
 
     socket.on(events.setNickname, ({ nickname }) => {
@@ -56,8 +68,17 @@ const socketController = (socket, io) => {
         sandPlayerUpdate();
     });
 
-    socket.on(events.sendMsg, ({ message }) =>
-        broadcast(events.newMsg, { message, nickname: socket.nickname })
+    socket.on(events.sendMsg, ({ message }) => {
+            if(message === word){
+                superBroadcast(events.newMsg, {
+                    message: `'${socket.nickname}'님 정답입니다! 정답은 '${word}'입니다.`,
+                    nickname: '알림봇'
+                });
+                addPoints(socket.id);
+            } else {
+                    broadcast(events.newMsg, { message, nickname: socket.nickname });
+            }
+        }
     );
 
     socket.on(events.beginPath, ({ x, y }) =>

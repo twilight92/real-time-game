@@ -9,7 +9,7 @@ html(lang="ko")
     body
         .loginBox
             form#jsLogin
-                input(placeholder="Whats your nickname", type="text")
+                input(placeholder="닉네임을 입력해주세요.", type="text")
         .gameContainer#jsGame
             .main
                 #jsNotifs
@@ -30,7 +30,7 @@ html(lang="ko")
                 .player__board#jsPBoard
                 ul.chat__messages#jsMessages
                 form.chat__form#jsSendMsg
-                    input(placeholder="Write a message", type="text")
+                    input(placeholder="정답을 입력해주세요.", type="text")
         script.
             window.events = !{events}
         script(src="/socket.io/socket.io.js")
