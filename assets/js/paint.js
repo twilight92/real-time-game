@@ -1,17 +1,17 @@
-import { getSocket } from "./sockets";
+import { getSocket } from './sockets';
 
-const canvas = document.getElementById("jsCanvas");
-const ctx = canvas.getContext("2d");
-const colors = document.getElementsByClassName("jsColor");
-const mode = document.getElementById("jsMode");
+const canvas = document.getElementById('jsCanvas');
+const ctx = canvas.getContext('2d');
+const colors = document.getElementsByClassName('jsColor');
+const mode = document.getElementById('jsMode');
 
-const INITIAL_COLOR = "#2c2c2c";
+const INITIAL_COLOR = '#2c2c2c';
 const CANVAS_SIZE = 700;
 
 canvas.width = CANVAS_SIZE;
 canvas.height = CANVAS_SIZE;
 
-ctx.fillStyle = "white";
+ctx.fillStyle = 'white';
 ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
 ctx.strokeStyle = INITIAL_COLOR;
 ctx.fillStyle = INITIAL_COLOR;
@@ -20,25 +20,34 @@ ctx.lineWidth = 2.5;
 let painting = false;
 let filling = false;
 
-function stopPainting() {
+const stopPainting = () => {
   painting = false;
-}
+};
 
-function startPainting() {
+const startPainting = () => {
   painting = true;
-}
+};
 
 const beginPath = (x, y) => {
   ctx.beginPath();
   ctx.moveTo(x, y);
 };
 
-const strokePath = (x, y) => {
+/*
+내가 그릴 때에도 동작하면서,
+남이 그릴 때에도 색상 변화를 전달받기 위함
+*/
+const strokePath = (x, y, color = null) => {
+  let currentColor = ctx.strokeStyle;
+  if (color !== null) {
+    ctx.strokeStyle = color;
+  }
   ctx.lineTo(x, y);
   ctx.stroke();
+  ctx.strokeStyle = currentColor;
 };
 
-function onMouseMove(event) {
+const onMouseMove = event => {
   const x = event.offsetX;
   const y = event.offsetY;
   if (!painting) {
@@ -46,52 +55,67 @@ function onMouseMove(event) {
     getSocket().emit(window.events.beginPath, { x, y });
   } else {
     strokePath(x, y);
-    getSocket().emit(window.events.strokePath, { x, y });
+    getSocket().emit(window.events.strokePath, {
+      x,
+      y,
+      color: ctx.strokeStyle
+    });
   }
-}
+};
 
-function handleColorClick(event) {
+const handleColorClick = event => {
   const color = event.target.style.backgroundColor;
   ctx.strokeStyle = color;
   ctx.fillStyle = color;
-}
+};
 
-function handleModeClick() {
+const handleModeClick = () => {
   if (filling === true) {
     filling = false;
-    mode.innerText = "Fill";
+    mode.innerText = 'Fill';
   } else {
     filling = true;
-    mode.innerText = "Paint";
+    mode.innerText = 'Paint';
   }
-}
+};
 
-function handleCanvasClick() {
+const fill = (color = null) => {
+  let currentColor = ctx.fillStyle;
+  if(color !== null){
+    ctx.fillStyle = color;
+  }
+  ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+  ctx.fillStyle = currentColor;
+};
+
+const handleCanvasClick = () => {
   if (filling) {
-    ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    fill();
+    getSocket().emit(window.events.fill, { color:ctx.fillStyle });
   }
 }
 
-function handleCM(event) {
+const handleCM = event => {
   event.preventDefault();
 }
 
 if (canvas) {
-  canvas.addEventListener("mousemove", onMouseMove);
-  canvas.addEventListener("mousedown", startPainting);
-  canvas.addEventListener("mouseup", stopPainting);
-  canvas.addEventListener("mouseleave", stopPainting);
-  canvas.addEventListener("click", handleCanvasClick);
-  canvas.addEventListener("contextmenu", handleCM);
+  canvas.addEventListener('mousemove', onMouseMove);
+  canvas.addEventListener('mousedown', startPainting);
+  canvas.addEventListener('mouseup', stopPainting);
+  canvas.addEventListener('mouseleave', stopPainting);
+  canvas.addEventListener('click', handleCanvasClick);
+  canvas.addEventListener('contextmenu', handleCM);
 }
 
 Array.from(colors).forEach(color =>
-  color.addEventListener("click", handleColorClick)
+  color.addEventListener('click', handleColorClick)
 );
 
 if (mode) {
-  mode.addEventListener("click", handleModeClick);
+  mode.addEventListener('click', handleModeClick);
 }
 
 export const handleBeganPath = ({ x, y }) => beginPath(x, y);
-export const handleStrokedPath = ({ x, y }) => strokePath(x, y);
+export const handleStrokedPath = ({ x, y, color }) => strokePath(x, y, color);
+export const handleFilled = ({ color }) => fill(color);
