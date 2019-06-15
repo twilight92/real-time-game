@@ -13,7 +13,7 @@ const socketController = (socket, io) => {
 
     socket.on(events.setNickname, ({ nickname }) => {
         socket.nickname = nickname;
-        sockets.push({id: socket.id, point: 0, nickname: nickname});
+        sockets.push({id: socket.id, points: 0, nickname: nickname});
         broadcast(events.newUser, { nickname });
         sandPlayerUpdate();
     });
