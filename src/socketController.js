@@ -5,6 +5,7 @@ let sockets = [];
 let inProgress = false;
 let word = null;
 let leader = null;
+let timeout = null;
 
 const chooseLeader = () => sockets[Math.floor(Math.random() * sockets.length)];
 
@@ -17,21 +18,28 @@ const socketController = (socket, io) => {
     const superBroadcast = (event, data) => io.emit(event, data);
     const sandPlayerUpdate = () => superBroadcast(events.playerUpdate, { sockets });
     const startGame = () => {
-        if(inProgress === false){
-            inProgress = true;
-            leader = chooseLeader();
-            word = chooseWord();
-            superBroadcast(events.gameStarting);
-            //갑작스럽게 진행되지 않도록 setTimeout 걸어줌
-            setTimeout(() => {
-                superBroadcast(events.gameStarted);
-                io.to(leader.id).emit(events.leaderNotif, { word });
-            }, 3000);
+        if(sockets.length > 1){
+            if(inProgress === false){
+                inProgress = true;
+                leader = chooseLeader();
+                word = chooseWord();
+                superBroadcast(events.gameStarting);
+                //갑작스럽게 진행되지 않도록 setTimeout 걸어줌
+                setTimeout(() => {
+                    superBroadcast(events.gameStarted);
+                    io.to(leader.id).emit(events.leaderNotif, { word });
+                    timeout = setTimeout(endGame, 30000);
+                }, 5000);
+            }
         }
     };
     const endGame = () => {
         inProgress = false;
         superBroadcast(events.gameEnded);
+        setTimeout(() => startGame(), 2000);
+        if(timeout !== null){
+            clearTimeout(timeout);
+        }
     };
 
     const addPoints = (id) => {
@@ -50,9 +58,7 @@ const socketController = (socket, io) => {
         sockets.push({id: socket.id, points: 0, nickname: nickname});
         broadcast(events.newUser, { nickname });
         sandPlayerUpdate();
-        if(sockets.length === 2){
-            startGame();
-        }
+        startGame();
     });
 
     socket.on(events.disconnect, () => {
