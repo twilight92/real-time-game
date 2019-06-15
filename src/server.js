@@ -48,18 +48,22 @@ HTTP는 GET/ POST/ PUT/ PATCH/ DELETE 라우터를 가지고 있다.
 
 이벤트에서 가장 중요한 것은 'connection'
 */
+// io는 서버 자체 : 이걸 이용해서 무언가 할 수 있다.
 const io = socketIO.listen(server);
 // const io = socketIO(server);
-
-/* 
-public : 자신을 포함한 모든 클라이언트에 데이터 전달
-broadcast : 자신을 제외한 모든 클라이언트에 데이터 전달
-private : 특정 클라이언트에 데이터 전달
- */
 
 /* 
 서버파일이 너무 커지지 않게 하면서
 동시에 socket도 활용할 수 있도록 내용 socketController.js로 이동
  */
+
+// socket은 연결되어있는 각 socket들을 뜻한다.
+/* 
+socket은 하나의 socket한테만 메시지를 보내거나
+자기 자신을 제외한 모두한테 보내는것 외에는 옵션이 없다.
 io.on("connection", socket => socketController(socket));
 
+이 경우에 우리한테 필요한 건 모든 connected 상태의 client들에게만 메시지를 보내는 것(나를 포함)
+그래서 이제는 socket만 쓰는게 아니라 io도 사용해야하므로 추가.
+*/
+io.on("connection", socket => socketController(socket, io));
